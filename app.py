@@ -307,7 +307,7 @@ def render_add_tab(pets):
 # ---------- 메인 ----------
 
 def show_entrance_animation():
-    """하늘의 문이 열리며 '우리 아이를 보러 갑니다' 문구가 뜨는 15초 인트로."""
+    """하늘의 문이 열리며 '우리 아이들을 보러 갑니다' 문구가 뜨는 15초 인트로."""
     stars = ""
     star_positions = [
         (6, 8, 3), (14, 22, 2), (22, 6, 4), (30, 30, 2), (38, 12, 3),
@@ -360,7 +360,7 @@ def show_entrance_animation():
           position:absolute; left:0; right:0; bottom:22px; text-align:center;
           color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
           opacity:0; animation: fade-in 1.8s ease-in 8.5s forwards;">
-        🐾 이제 우리 아이들을 보러 갑니다 🐾
+        🐾 우리 아이들을 보러 갑니다 🐾
       </div>
     </div>
     <style>
