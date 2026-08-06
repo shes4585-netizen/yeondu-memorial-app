@@ -307,7 +307,7 @@ def render_add_tab(pets):
 # ---------- 메인 ----------
 
 def show_entrance_animation():
-    """하늘의 문이 열리며 '우리 아이를 보러 갑니다' 문구가 뜨는 10초 인트로."""
+    """하늘의 문이 열리며 '우리 아이를 보러 갑니다' 문구가 뜨는 15초 인트로."""
     stars = ""
     star_positions = [
         (6, 8, 3), (14, 22, 2), (22, 6, 4), (30, 30, 2), (38, 12, 3),
@@ -336,7 +336,7 @@ def show_entrance_animation():
           position:absolute; left:50%; top:50%; width:280px; height:280px;
           transform: translate(-50%,-50%); border-radius:50%;
           background: radial-gradient(circle, rgba(255,244,214,0.95) 0%, rgba(255,244,214,0.35) 45%, rgba(255,244,214,0) 75%);
-          opacity:0; animation: glow-in 10s ease-in forwards;">
+          opacity:0; animation: glow-in 15s ease-in forwards;">
       </div>
 
       <!-- 왼쪽 문 -->
@@ -344,7 +344,7 @@ def show_entrance_animation():
           position:absolute; top:0; left:0; width:50%; height:100%;
           background: linear-gradient(90deg, #d9c9a3 0%, #c2a877 100%);
           border-right: 3px solid #8a6f43; box-shadow: 8px 0 18px rgba(0,0,0,0.35);
-          animation: open-left 7s ease-in-out 0.5s forwards;">
+          animation: open-left 10.5s ease-in-out 0.75s forwards;">
       </div>
 
       <!-- 오른쪽 문 -->
@@ -352,14 +352,14 @@ def show_entrance_animation():
           position:absolute; top:0; right:0; width:50%; height:100%;
           background: linear-gradient(270deg, #d9c9a3 0%, #c2a877 100%);
           border-left: 3px solid #8a6f43; box-shadow: -8px 0 18px rgba(0,0,0,0.35);
-          animation: open-right 7s ease-in-out 0.5s forwards;">
+          animation: open-right 10.5s ease-in-out 0.75s forwards;">
       </div>
 
       <!-- 문구 -->
       <div style="
           position:absolute; left:0; right:0; bottom:22px; text-align:center;
           color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
-          opacity:0; animation: fade-in 1.4s ease-in 5.5s forwards;">
+          opacity:0; animation: fade-in 1.8s ease-in 8.5s forwards;">
         🐾 우리 아이를 보러 갑니다 🐾
       </div>
     </div>
@@ -390,7 +390,7 @@ def show_entrance_animation():
     placeholder = st.empty()
     with placeholder:
         st.components.v1.html(html, height=360)
-    time.sleep(10)
+    time.sleep(15)
     placeholder.empty()
 
 
