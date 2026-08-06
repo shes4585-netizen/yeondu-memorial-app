@@ -8,7 +8,7 @@ from PIL import Image, ImageOps
 import github_storage as gh
 from backup_utils import build_pet_zip, make_downloadable_backup
 
-st.set_page_config(page_title="꼬리치는 꼬리별", page_icon="🐾", layout="centered")
+st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
 
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
@@ -310,7 +310,7 @@ def check_password() -> bool:
     if st.session_state.get("authed", False):
         return True
 
-    st.title("🐾 꼬리치는 꼬리별")
+    st.title("🐾 꼬리별")
     pw = st.text_input("비밀번호를 입력하세요", type="password", key="pw_input")
     if st.button("입장"):
         correct = st.secrets.get("APP_PASSWORD", None)
@@ -333,7 +333,7 @@ def main():
             st.session_state["authed"] = False
             st.rerun()
 
-    st.title("🐾 꼬리치는 꼬리별")
+    st.title("🐾 꼬리별")
 
     try:
         pets = load_pets()
