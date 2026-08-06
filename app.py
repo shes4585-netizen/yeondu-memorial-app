@@ -307,33 +307,63 @@ def render_add_tab(pets):
 # ---------- 메인 ----------
 
 def show_entrance_animation():
-    """차단바가 열리며 '함께했던 시간으로 입장' 문구가 뜨는 1.5초 인트로."""
+    """하늘의 문이 열리며 '그리운 아이를 만나러 갑니다' 문구가 뜨는 5초 인트로."""
     html = """
     <div style="
-        display:flex; flex-direction:column; align-items:center; justify-content:center;
-        height:260px; background:#0e1117;">
-      <div style="position:relative; width:220px; height:120px;">
-        <div style="position:absolute; left:8px; bottom:0; width:14px; height:120px;
-                    background:#444; border-radius:4px;"></div>
-        <div style="position:absolute; left:200px; bottom:0; width:14px; height:120px;
-                    background:#444; border-radius:4px;"></div>
-        <div style="
-            position:absolute; left:15px; bottom:100px; width:190px; height:10px;
-            background:repeating-linear-gradient(90deg,#e63946 0 20px,#f1faee 20px 40px);
-            border-radius:4px; transform-origin: left center;
-            animation: barrier-up 1.4s ease-in-out forwards;">
-        </div>
-      </div>
+        position:relative; width:100%; height:320px; overflow:hidden; border-radius:12px;
+        background: linear-gradient(180deg, #1b2a4a 0%, #3a5a8c 35%, #a8c9e8 65%, #fdf3d9 100%);">
+
+      <!-- 문 너머로 보이는 빛 -->
       <div style="
-          margin-top:18px; color:#f1faee; font-size:20px; font-weight:600;
-          opacity:0; animation: fade-in 1s ease-in 0.5s forwards;">
-        🐾 함께했던 시간으로 입장 🐾
+          position:absolute; left:50%; top:50%; width:260px; height:260px;
+          transform: translate(-50%,-50%); border-radius:50%;
+          background: radial-gradient(circle, rgba(255,244,214,0.95) 0%, rgba(255,244,214,0.35) 45%, rgba(255,244,214,0) 75%);
+          opacity:0; animation: glow-in 5s ease-in forwards;">
+      </div>
+
+      <!-- 별 -->
+      <div style="position:absolute; top:14%; left:20%; width:4px; height:4px; background:#fff; border-radius:50%; opacity:.8;"></div>
+      <div style="position:absolute; top:22%; left:70%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.7;"></div>
+      <div style="position:absolute; top:10%; left:55%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.6;"></div>
+      <div style="position:absolute; top:30%; left:35%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.6;"></div>
+
+      <!-- 왼쪽 문 -->
+      <div style="
+          position:absolute; top:0; left:0; width:50%; height:100%;
+          background: linear-gradient(90deg, #d9c9a3 0%, #c2a877 100%);
+          border-right: 3px solid #8a6f43; box-shadow: 8px 0 18px rgba(0,0,0,0.35);
+          animation: open-left 3.5s ease-in-out 0.3s forwards;">
+      </div>
+
+      <!-- 오른쪽 문 -->
+      <div style="
+          position:absolute; top:0; right:0; width:50%; height:100%;
+          background: linear-gradient(270deg, #d9c9a3 0%, #c2a877 100%);
+          border-left: 3px solid #8a6f43; box-shadow: -8px 0 18px rgba(0,0,0,0.35);
+          animation: open-right 3.5s ease-in-out 0.3s forwards;">
+      </div>
+
+      <!-- 문구 -->
+      <div style="
+          position:absolute; left:0; right:0; bottom:22px; text-align:center;
+          color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
+          opacity:0; animation: fade-in 1.2s ease-in 2.6s forwards;">
+        🐾 그리운 아이를 만나러 갑니다 🐾
       </div>
     </div>
     <style>
-      @keyframes barrier-up {
-        0%   { transform: rotate(0deg); }
-        100% { transform: rotate(-75deg); }
+      @keyframes open-left {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(-100%); }
+      }
+      @keyframes open-right {
+        0%   { transform: translateX(0); }
+        100% { transform: translateX(100%); }
+      }
+      @keyframes glow-in {
+        0%   { opacity: 0; }
+        40%  { opacity: 0; }
+        100% { opacity: 1; }
       }
       @keyframes fade-in {
         0%   { opacity: 0; transform: translateY(6px); }
@@ -343,8 +373,8 @@ def show_entrance_animation():
     """
     placeholder = st.empty()
     with placeholder:
-        st.components.v1.html(html, height=280)
-    time.sleep(1.5)
+        st.components.v1.html(html, height=340)
+    time.sleep(5)
     placeholder.empty()
 
 
