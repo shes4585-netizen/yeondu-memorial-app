@@ -187,6 +187,19 @@ def render_pet_tab(pet, pets):
                 save_gallery(pet_id, gallery)
                 st.success("댓글을 남겼어요.")
                 st.rerun()
+
+        del_col1, del_col2 = st.columns([3, 1])
+        with del_col1:
+            del_confirm = st.checkbox("이 사진 삭제 확인", key=f"delc_{pet_id}_{item['filename']}")
+        with del_col2:
+            if st.button("🗑️ 삭제", key=f"delbtn_{pet_id}_{item['filename']}", disabled=not del_confirm):
+                if got:
+                    gh.delete_file(f"data/{pet_id}/photos/{item['filename']}", got[1],
+                                    message=f"delete photo {item['filename']}")
+                gallery[:] = [g for g in gallery if g["filename"] != item["filename"]]
+                save_gallery(pet_id, gallery)
+                st.success("사진을 삭제했어요.")
+                st.rerun()
         st.divider()
 
     st.markdown("#### 💾 백업")
