@@ -69,23 +69,25 @@ def render_home(pets):
     for pet in pets:
         gallery = load_gallery(pet["id"])
         for item in gallery:
+            comments = item.get("comments", [])
+            if comments:
+                latest_comment = max(comments, key=lambda c: c["timestamp"])
+                latest_time = latest_comment["timestamp"]
+                event_type = "comment"
+                text = latest_comment["text"]
+            else:
+                latest_time = item["uploaded_at"]
+                event_type = "photo"
+                text = None
+
             events.append({
-                "type": "photo",
+                "type": event_type,
                 "pet_name": pet["name"],
                 "pet_id": pet["id"],
                 "filename": item["filename"],
-                "time": item["uploaded_at"],
-                "text": None,
+                "time": latest_time,
+                "text": text,
             })
-            for c in item.get("comments", []):
-                events.append({
-                    "type": "comment",
-                    "pet_name": pet["name"],
-                    "pet_id": pet["id"],
-                    "filename": item["filename"],
-                    "time": c["timestamp"],
-                    "text": c["text"],
-                })
 
     events.sort(key=lambda e: e["time"], reverse=True)
 
