@@ -8,7 +8,7 @@ from PIL import Image, ImageOps
 import github_storage as gh
 from backup_utils import build_pet_zip, make_downloadable_backup
 
-st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
+st.set_page_config(page_title="꼬리치는 꼬리별", page_icon="🐾", layout="centered")
 
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
@@ -36,21 +36,30 @@ def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
 
 
 # ---------- 데이터 로드/저장 ----------
+# GitHub API는 커밋 직후 바로 다시 읽으면 잠깐 예전 값이 보일 수 있어서,
+# 세션 안에서는 방금 저장한 값을 그대로 기억해뒀다가 돌려준다.
 
 def load_pets():
-    return gh.get_json(PETS_PATH, default=[])
+    if "_pets_cache" not in st.session_state:
+        st.session_state["_pets_cache"] = gh.get_json(PETS_PATH, default=[])
+    return st.session_state["_pets_cache"]
 
 
 def save_pets(pets):
     gh.put_json(PETS_PATH, pets, message="update pets.json")
+    st.session_state["_pets_cache"] = pets
 
 
 def load_gallery(pet_id):
-    return gh.get_json(f"data/{pet_id}/gallery.json", default=[])
+    cache = st.session_state.setdefault("_gallery_cache", {})
+    if pet_id not in cache:
+        cache[pet_id] = gh.get_json(f"data/{pet_id}/gallery.json", default=[])
+    return cache[pet_id]
 
 
 def save_gallery(pet_id, gallery):
     gh.put_json(f"data/{pet_id}/gallery.json", gallery, message=f"update gallery for {pet_id}")
+    st.session_state.setdefault("_gallery_cache", {})[pet_id] = gallery
 
 
 def now_str():
@@ -141,6 +150,7 @@ def render_pet_tab(pet, pets):
             gh.delete_folder(f"data/{pet_id}", message=f"delete pet {pet_id}")
             pets[:] = [p for p in pets if p["id"] != pet_id]
             save_pets(pets)
+            st.session_state.setdefault("_gallery_cache", {}).pop(pet_id, None)
             st.success("삭제했어요.")
             st.rerun()
 
@@ -300,7 +310,7 @@ def check_password() -> bool:
     if st.session_state.get("authed", False):
         return True
 
-    st.title("🐾 꼬리별")
+    st.title("🐾 꼬리치는 꼬리별")
     pw = st.text_input("비밀번호를 입력하세요", type="password", key="pw_input")
     if st.button("입장"):
         correct = st.secrets.get("APP_PASSWORD", None)
@@ -323,7 +333,7 @@ def main():
             st.session_state["authed"] = False
             st.rerun()
 
-    st.title("🐾 꼬리별")
+    st.title("🐾 꼬리치는 꼬리별")
 
     try:
         pets = load_pets()
