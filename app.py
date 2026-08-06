@@ -307,32 +307,44 @@ def render_add_tab(pets):
 # ---------- 메인 ----------
 
 def show_entrance_animation():
-    """하늘의 문이 열리며 '그리운 아이를 만나러 갑니다' 문구가 뜨는 5초 인트로."""
-    html = """
+    """하늘의 문이 열리며 '우리 아이를 보러 갑니다' 문구가 뜨는 10초 인트로."""
+    stars = ""
+    star_positions = [
+        (6, 8, 3), (14, 22, 2), (22, 6, 4), (30, 30, 2), (38, 12, 3),
+        (46, 26, 2), (54, 9, 4), (62, 20, 2), (70, 5, 3), (78, 28, 2),
+        (86, 14, 4), (10, 34, 2), (18, 40, 3), (44, 38, 2), (60, 36, 3),
+        (76, 40, 2), (90, 32, 3), (4, 20, 2), (94, 18, 2), (50, 4, 2),
+    ]
+    for left, top, size in star_positions:
+        delay = (left % 10) / 10 * 3
+        stars += (
+            f'<div style="position:absolute; left:{left}%; top:{top}%; '
+            f'width:{size}px; height:{size}px; background:#fff; border-radius:50%; '
+            f'box-shadow:0 0 6px 1px rgba(255,255,255,0.8); '
+            f'opacity:.3; animation: twinkle 2.4s ease-in-out {delay}s infinite;"></div>'
+        )
+
+    html = f"""
     <div style="
-        position:relative; width:100%; height:320px; overflow:hidden; border-radius:12px;
-        background: linear-gradient(180deg, #1b2a4a 0%, #3a5a8c 35%, #a8c9e8 65%, #fdf3d9 100%);">
+        position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
+        background: linear-gradient(180deg, #05081a 0%, #10204a 30%, #3a5a8c 55%, #a8c9e8 78%, #fdf3d9 100%);">
+
+      {stars}
 
       <!-- 문 너머로 보이는 빛 -->
       <div style="
-          position:absolute; left:50%; top:50%; width:260px; height:260px;
+          position:absolute; left:50%; top:50%; width:280px; height:280px;
           transform: translate(-50%,-50%); border-radius:50%;
           background: radial-gradient(circle, rgba(255,244,214,0.95) 0%, rgba(255,244,214,0.35) 45%, rgba(255,244,214,0) 75%);
-          opacity:0; animation: glow-in 5s ease-in forwards;">
+          opacity:0; animation: glow-in 10s ease-in forwards;">
       </div>
-
-      <!-- 별 -->
-      <div style="position:absolute; top:14%; left:20%; width:4px; height:4px; background:#fff; border-radius:50%; opacity:.8;"></div>
-      <div style="position:absolute; top:22%; left:70%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.7;"></div>
-      <div style="position:absolute; top:10%; left:55%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.6;"></div>
-      <div style="position:absolute; top:30%; left:35%; width:3px; height:3px; background:#fff; border-radius:50%; opacity:.6;"></div>
 
       <!-- 왼쪽 문 -->
       <div style="
           position:absolute; top:0; left:0; width:50%; height:100%;
           background: linear-gradient(90deg, #d9c9a3 0%, #c2a877 100%);
           border-right: 3px solid #8a6f43; box-shadow: 8px 0 18px rgba(0,0,0,0.35);
-          animation: open-left 3.5s ease-in-out 0.3s forwards;">
+          animation: open-left 7s ease-in-out 0.5s forwards;">
       </div>
 
       <!-- 오른쪽 문 -->
@@ -340,41 +352,45 @@ def show_entrance_animation():
           position:absolute; top:0; right:0; width:50%; height:100%;
           background: linear-gradient(270deg, #d9c9a3 0%, #c2a877 100%);
           border-left: 3px solid #8a6f43; box-shadow: -8px 0 18px rgba(0,0,0,0.35);
-          animation: open-right 3.5s ease-in-out 0.3s forwards;">
+          animation: open-right 7s ease-in-out 0.5s forwards;">
       </div>
 
       <!-- 문구 -->
       <div style="
           position:absolute; left:0; right:0; bottom:22px; text-align:center;
           color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
-          opacity:0; animation: fade-in 1.2s ease-in 2.6s forwards;">
-        🐾 그리운 아이를 만나러 갑니다 🐾
+          opacity:0; animation: fade-in 1.4s ease-in 5.5s forwards;">
+        🐾 우리 아이를 보러 갑니다 🐾
       </div>
     </div>
     <style>
-      @keyframes open-left {
-        0%   { transform: translateX(0); }
-        100% { transform: translateX(-100%); }
-      }
-      @keyframes open-right {
-        0%   { transform: translateX(0); }
-        100% { transform: translateX(100%); }
-      }
-      @keyframes glow-in {
-        0%   { opacity: 0; }
-        40%  { opacity: 0; }
-        100% { opacity: 1; }
-      }
-      @keyframes fade-in {
-        0%   { opacity: 0; transform: translateY(6px); }
-        100% { opacity: 1; transform: translateY(0); }
-      }
+      @keyframes open-left {{
+        0%   {{ transform: translateX(0); }}
+        100% {{ transform: translateX(-100%); }}
+      }}
+      @keyframes open-right {{
+        0%   {{ transform: translateX(0); }}
+        100% {{ transform: translateX(100%); }}
+      }}
+      @keyframes glow-in {{
+        0%   {{ opacity: 0; }}
+        55%  {{ opacity: 0; }}
+        100% {{ opacity: 1; }}
+      }}
+      @keyframes fade-in {{
+        0%   {{ opacity: 0; transform: translateY(6px); }}
+        100% {{ opacity: 1; transform: translateY(0); }}
+      }}
+      @keyframes twinkle {{
+        0%, 100% {{ opacity: .3; }}
+        50%      {{ opacity: 1; }}
+      }}
     </style>
     """
     placeholder = st.empty()
     with placeholder:
-        st.components.v1.html(html, height=340)
-    time.sleep(5)
+        st.components.v1.html(html, height=360)
+    time.sleep(10)
     placeholder.empty()
 
 
