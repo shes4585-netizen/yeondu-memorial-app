@@ -247,7 +247,34 @@ def render_add_tab(pets):
 
 # ---------- 메인 ----------
 
+def check_password() -> bool:
+    """세션 상태에 인증 여부를 저장하는 간단한 비밀번호 게이트."""
+    if st.session_state.get("authed", False):
+        return True
+
+    st.title("🐾 우리 아이들")
+    pw = st.text_input("비밀번호를 입력하세요", type="password", key="pw_input")
+    if st.button("입장"):
+        correct = st.secrets.get("APP_PASSWORD", None)
+        if correct is None:
+            st.error("APP_PASSWORD가 secrets에 설정되어 있지 않아요.")
+        elif pw == correct:
+            st.session_state["authed"] = True
+            st.rerun()
+        else:
+            st.error("비밀번호가 틀렸어요.")
+    return False
+
+
 def main():
+    if not check_password():
+        return
+
+    with st.sidebar:
+        if st.button("로그아웃"):
+            st.session_state["authed"] = False
+            st.rerun()
+
     st.title("🐾 우리 아이들")
 
     try:
