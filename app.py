@@ -342,7 +342,11 @@ def main():
         st.exception(e)
         return
 
-    tab_labels = ["🏠 홈"] + [p["name"] for p in pets] + ["➕ 추가"]
+    def pet_tab_label(p):
+        prefix = "·⋆✦★" if p.get("death_date", "").strip() else "🐾"
+        return f"{prefix} {p['name']}"
+
+    tab_labels = ["🏠 홈"] + [pet_tab_label(p) for p in pets] + ["➕ 추가"]
     tabs = st.tabs(tab_labels)
 
     with tabs[0]:
