@@ -8,7 +8,7 @@ from PIL import Image, ImageOps
 import github_storage as gh
 from backup_utils import build_pet_zip, make_downloadable_backup
 
-st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
+st.set_page_config(page_title="꼬리치는 꼬리별", page_icon="🐾", layout="centered")
 
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
@@ -176,8 +176,41 @@ def render_pet_tab(pet, pets):
             st.image(got[0], use_container_width=True)
         st.caption(item["uploaded_at"])
 
-        for c in item.get("comments", []):
-            st.write(f"💬 {c['text']}  ·  _{c['timestamp']}_")
+        for idx, c in enumerate(item.get("comments", [])):
+            edit_key = f"editing_{pet_id}_{item['filename']}_{idx}"
+            if st.session_state.get(edit_key, False):
+                edited_text = st.text_input(
+                    "댓글 수정", value=c["text"],
+                    key=f"edit_input_{pet_id}_{item['filename']}_{idx}",
+                )
+                ec1, ec2 = st.columns(2)
+                with ec1:
+                    if st.button("저장", key=f"edit_save_{pet_id}_{item['filename']}_{idx}"):
+                        if edited_text.strip():
+                            c["text"] = edited_text.strip()
+                            c["timestamp"] = now_str()
+                            save_gallery(pet_id, gallery)
+                            st.session_state[edit_key] = False
+                            st.success("댓글을 수정했어요.")
+                            st.rerun()
+                with ec2:
+                    if st.button("취소", key=f"edit_cancel_{pet_id}_{item['filename']}_{idx}"):
+                        st.session_state[edit_key] = False
+                        st.rerun()
+            else:
+                cc1, cc2, cc3 = st.columns([6, 1, 1])
+                with cc1:
+                    st.write(f"💬 {c['text']}  ·  _{c['timestamp']}_")
+                with cc2:
+                    if st.button("✏️", key=f"edit_btn_{pet_id}_{item['filename']}_{idx}"):
+                        st.session_state[edit_key] = True
+                        st.rerun()
+                with cc3:
+                    if st.button("🗑️", key=f"cdel_btn_{pet_id}_{item['filename']}_{idx}"):
+                        item["comments"].pop(idx)
+                        save_gallery(pet_id, gallery)
+                        st.success("댓글을 삭제했어요.")
+                        st.rerun()
 
         new_comment = st.text_input("댓글 달기", key=f"comment_{pet_id}_{item['filename']}")
         if st.button("댓글 등록", key=f"comment_btn_{pet_id}_{item['filename']}"):
@@ -267,7 +300,7 @@ def check_password() -> bool:
     if st.session_state.get("authed", False):
         return True
 
-    st.title("🐾 꼬리별")
+    st.title("🐾 꼬리치는 꼬리별")
     pw = st.text_input("비밀번호를 입력하세요", type="password", key="pw_input")
     if st.button("입장"):
         correct = st.secrets.get("APP_PASSWORD", None)
@@ -290,7 +323,7 @@ def main():
             st.session_state["authed"] = False
             st.rerun()
 
-    st.title("🐾 꼬리별")
+    st.title("🐾 꼬리치는 꼬리별")
 
     try:
         pets = load_pets()
