@@ -1,7 +1,9 @@
+import io
 import uuid
 import datetime as dt
 
 import streamlit as st
+from PIL import Image, ImageOps
 
 import github_storage as gh
 from backup_utils import build_pet_zip, make_downloadable_backup
@@ -9,6 +11,28 @@ from backup_utils import build_pet_zip, make_downloadable_backup
 st.set_page_config(page_title="우리 아이들", page_icon="🐾", layout="centered")
 
 PETS_PATH = "data/pets.json"
+MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
+JPEG_QUALITY = 85
+
+
+def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
+    """업로드된 이미지를 모바일 보기에 적당한 크기로 리사이즈하고 JPEG로 압축.
+    반환값: (압축된 bytes, 파일 확장자 'jpg')"""
+    img = Image.open(io.BytesIO(raw_bytes))
+    img = ImageOps.exif_transpose(img)  # 휴대폰 사진 회전 정보 보정
+    if img.mode in ("RGBA", "P", "LA"):
+        img = img.convert("RGB")
+    elif img.mode != "RGB":
+        img = img.convert("RGB")
+
+    w, h = img.size
+    if max(w, h) > MAX_DIMENSION:
+        ratio = MAX_DIMENSION / max(w, h)
+        img = img.resize((int(w * ratio), int(h * ratio)), Image.LANCZOS)
+
+    out = io.BytesIO()
+    img.save(out, format="JPEG", quality=JPEG_QUALITY, optimize=True)
+    return out.getvalue(), "jpg"
 
 
 # ---------- 데이터 로드/저장 ----------
@@ -122,8 +146,10 @@ def render_pet_tab(pet, pets):
     uploaded = st.file_uploader("사진 선택", type=["jpg", "jpeg", "png", "webp"], key=f"upl_{pet_id}")
     if uploaded is not None:
         if st.button("업로드", key=f"upl_btn_{pet_id}"):
-            filename = f"{uuid.uuid4().hex[:8]}_{uploaded.name}"
-            gh.put_file(f"data/{pet_id}/photos/{filename}", uploaded.getvalue(),
+            with st.spinner("사진 크기 조정 중..."):
+                resized_bytes, ext = resize_image(uploaded.getvalue())
+            filename = f"{uuid.uuid4().hex[:8]}.{ext}"
+            gh.put_file(f"data/{pet_id}/photos/{filename}", resized_bytes,
                         message=f"add photo for {pet_id}")
             gallery = load_gallery(pet_id)
             gallery.append({
