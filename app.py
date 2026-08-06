@@ -1,4 +1,5 @@
 import io
+import time
 import uuid
 import datetime as dt
 
@@ -305,6 +306,48 @@ def render_add_tab(pets):
 
 # ---------- 메인 ----------
 
+def show_entrance_animation():
+    """차단바가 열리며 '함께했던 시간으로 입장' 문구가 뜨는 1.5초 인트로."""
+    html = """
+    <div style="
+        display:flex; flex-direction:column; align-items:center; justify-content:center;
+        height:260px; background:#0e1117;">
+      <div style="position:relative; width:220px; height:120px;">
+        <div style="position:absolute; left:8px; bottom:0; width:14px; height:120px;
+                    background:#444; border-radius:4px;"></div>
+        <div style="position:absolute; left:200px; bottom:0; width:14px; height:120px;
+                    background:#444; border-radius:4px;"></div>
+        <div style="
+            position:absolute; left:15px; bottom:100px; width:190px; height:10px;
+            background:repeating-linear-gradient(90deg,#e63946 0 20px,#f1faee 20px 40px);
+            border-radius:4px; transform-origin: left center;
+            animation: barrier-up 1.4s ease-in-out forwards;">
+        </div>
+      </div>
+      <div style="
+          margin-top:18px; color:#f1faee; font-size:20px; font-weight:600;
+          opacity:0; animation: fade-in 1s ease-in 0.5s forwards;">
+        🐾 함께했던 시간으로 입장 🐾
+      </div>
+    </div>
+    <style>
+      @keyframes barrier-up {
+        0%   { transform: rotate(0deg); }
+        100% { transform: rotate(-75deg); }
+      }
+      @keyframes fade-in {
+        0%   { opacity: 0; transform: translateY(6px); }
+        100% { opacity: 1; transform: translateY(0); }
+      }
+    </style>
+    """
+    placeholder = st.empty()
+    with placeholder:
+        st.components.v1.html(html, height=280)
+    time.sleep(1.5)
+    placeholder.empty()
+
+
 def check_password() -> bool:
     """세션 상태에 인증 여부를 저장하는 간단한 비밀번호 게이트."""
     if st.session_state.get("authed", False):
@@ -317,6 +360,7 @@ def check_password() -> bool:
         if correct is None:
             st.error("APP_PASSWORD가 secrets에 설정되어 있지 않아요.")
         elif pw == correct:
+            show_entrance_animation()
             st.session_state["authed"] = True
             st.rerun()
         else:
