@@ -346,18 +346,22 @@ def main():
         prefix = "·⋆✦★" if p.get("death_date", "").strip() else "🐾"
         return f"{prefix} {p['name']}"
 
-    tab_labels = ["🏠 홈"] + [pet_tab_label(p) for p in pets] + ["➕ 추가"]
-    tabs = st.tabs(tab_labels)
+    options = ["__home__"] + [p["id"] for p in pets] + ["__add__"]
+    label_map = {"__home__": "🏠 홈", "__add__": "➕ 추가"}
+    label_map.update({p["id"]: pet_tab_label(p) for p in pets})
 
-    with tabs[0]:
+    choice = st.selectbox(
+        "이동", options, format_func=lambda k: label_map[k], label_visibility="collapsed"
+    )
+    st.divider()
+
+    if choice == "__home__":
         render_home(pets)
-
-    for i, pet in enumerate(pets, start=1):
-        with tabs[i]:
-            render_pet_tab(pet, pets)
-
-    with tabs[-1]:
+    elif choice == "__add__":
         render_add_tab(pets)
+    else:
+        pet = next(p for p in pets if p["id"] == choice)
+        render_pet_tab(pet, pets)
 
 
 if __name__ == "__main__":
