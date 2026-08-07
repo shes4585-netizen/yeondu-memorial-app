@@ -16,11 +16,6 @@ st.markdown(
     <style>
     div[data-testid="stHorizontalBlock"] {
         flex-wrap: nowrap !important;
-        align-items: center !important;
-        gap: 0.4rem !important;
-    }
-    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
-        min-width: 0 !important;
     }
     </style>
     """,
@@ -226,7 +221,7 @@ def render_pet_tab(pet, pets):
                         st.rerun()
             else:
                 st.write(f"💬 {c['text']}  ·  _{c['timestamp']}_")
-                spacer, ecol1, ecol2 = st.columns([5, 1, 1])
+                ecol1, ecol2, _rest = st.columns([1, 1, 4])
                 with ecol1:
                     if st.button("✏️", key=f"edit_btn_{pet_id}_{item['filename']}_{idx}"):
                         st.session_state[edit_key] = True
