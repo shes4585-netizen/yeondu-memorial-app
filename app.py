@@ -225,14 +225,13 @@ def render_pet_tab(pet, pets):
                         st.session_state[edit_key] = False
                         st.rerun()
             else:
-                cc1, cc2, cc3 = st.columns([6, 1, 1])
-                with cc1:
-                    st.write(f"💬 {c['text']}  ·  _{c['timestamp']}_")
-                with cc2:
+                st.write(f"💬 {c['text']}  ·  _{c['timestamp']}_")
+                spacer, ecol1, ecol2 = st.columns([5, 1, 1])
+                with ecol1:
                     if st.button("✏️", key=f"edit_btn_{pet_id}_{item['filename']}_{idx}"):
                         st.session_state[edit_key] = True
                         st.rerun()
-                with cc3:
+                with ecol2:
                     if st.button("🗑️", key=f"cdel_btn_{pet_id}_{item['filename']}_{idx}"):
                         item["comments"].pop(idx)
                         save_gallery(pet_id, gallery)
