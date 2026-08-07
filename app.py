@@ -18,7 +18,7 @@ JPEG_QUALITY = 85
 
 
 def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
-    """업로드된 이미지를 모바일 보기에 적당한 크기로 리사이즈하고 JPEG로 압축.
+    """업로드된 이미지를 모바일 보기에 적당한 크기로 리사이즈하고 JPEG로 압축..
     반환값: (압축된 bytes, 파일 확장자 'jpg')"""
     img = Image.open(io.BytesIO(raw_bytes))
     img = ImageOps.exif_transpose(img)  # 휴대폰 사진 회전 정보 보정
