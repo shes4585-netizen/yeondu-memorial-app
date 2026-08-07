@@ -419,10 +419,19 @@ def check_password() -> bool:
     if st.session_state.get("authed", False):
         return True
 
+    correct = st.secrets.get("APP_PASSWORD", None)
+
+    # 주소 뒤에 ?key=비밀번호 가 붙어 있으면 비밀번호 입력 없이 자동 통과
+    # (홈 화면에 이 링크를 저장해두면 아이콘 터치만으로 바로 입장됨)
+    url_key = st.query_params.get("key")
+    if correct is not None and url_key == correct:
+        show_entrance_animation()
+        st.session_state["authed"] = True
+        st.rerun()
+
     st.title("🐾 꼬리별")
     pw = st.text_input("비밀번호를 입력하세요", type="password", key="pw_input")
     if st.button("입장"):
-        correct = st.secrets.get("APP_PASSWORD", None)
         if correct is None:
             st.error("APP_PASSWORD가 secrets에 설정되어 있지 않아요.")
         elif pw == correct:
