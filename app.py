@@ -341,7 +341,7 @@ def show_entrance_animation():
 
     html = f"""
     <audio autoplay>
-      <source src="data:audio/mp3;base64,{INTRO_AUDIO_B64}" type="audio/mp3">
+      <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
     </audio>
     <div style="
         position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
