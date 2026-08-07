@@ -7,6 +7,7 @@ import streamlit as st
 from PIL import Image, ImageOps
 
 import github_storage as gh
+from intro_audio import INTRO_AUDIO_B64
 from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
@@ -339,6 +340,9 @@ def show_entrance_animation():
         )
 
     html = f"""
+    <audio autoplay>
+      <source src="data:audio/mp3;base64,{INTRO_AUDIO_B64}" type="audio/mp3">
+    </audio>
     <div style="
         position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
         background: linear-gradient(180deg, #05081a 0%, #10204a 30%, #3a5a8c 55%, #a8c9e8 78%, #fdf3d9 100%);">
@@ -463,6 +467,24 @@ def main():
     choice = st.selectbox(
         "이동", options, format_func=lambda k: label_map[k], label_visibility="collapsed"
     )
+
+    if pets:
+        with st.expander("🔀 탭 순서 바꾸기"):
+            for i, p in enumerate(pets):
+                rc1, rc2, rc3 = st.columns([5, 1, 1])
+                with rc1:
+                    st.write(pet_tab_label(p))
+                with rc2:
+                    if st.button("⬆️", key=f"up_{p['id']}", disabled=(i == 0)):
+                        pets[i - 1], pets[i] = pets[i], pets[i - 1]
+                        save_pets(pets)
+                        st.rerun()
+                with rc3:
+                    if st.button("⬇️", key=f"down_{p['id']}", disabled=(i == len(pets) - 1)):
+                        pets[i + 1], pets[i] = pets[i], pets[i + 1]
+                        save_pets(pets)
+                        st.rerun()
+
     st.divider()
 
     if choice == "__home__":
