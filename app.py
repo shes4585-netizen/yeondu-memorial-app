@@ -11,6 +11,22 @@ from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
 
+st.markdown(
+    """
+    <style>
+    div[data-testid="stHorizontalBlock"] {
+        flex-wrap: nowrap !important;
+        align-items: center !important;
+        gap: 0.4rem !important;
+    }
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {
+        min-width: 0 !important;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
+
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
 JPEG_QUALITY = 85
@@ -223,7 +239,11 @@ def render_pet_tab(pet, pets):
                         st.success("댓글을 삭제했어요.")
                         st.rerun()
 
-        new_comment = st.text_input("댓글 달기", key=f"comment_{pet_id}_{item['filename']}")
+        new_comment = st.text_input(
+            "댓글 달기",
+            key=f"comment_{pet_id}_{item['filename']}",
+            placeholder="여기 클릭 후 입력해 주세요",
+        )
         if st.button("댓글 등록", key=f"comment_btn_{pet_id}_{item['filename']}"):
             if new_comment.strip():
                 item.setdefault("comments", []).append({
@@ -307,7 +327,7 @@ def render_add_tab(pets):
 # ---------- 메인 ----------
 
 def show_entrance_animation():
-    """하늘의 문이 열리며 '우리 아이들을 보러 갑니다' 문구가 뜨는 15초 인트로."""
+    """하늘의 문이 열리며 '우리 아이를 보러 갑니다' 문구가 뜨는 15초 인트로."""
     stars = ""
     star_positions = [
         (6, 8, 3), (14, 22, 2), (22, 6, 4), (30, 30, 2), (38, 12, 3),
@@ -360,7 +380,7 @@ def show_entrance_animation():
           position:absolute; left:0; right:0; bottom:22px; text-align:center;
           color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
           opacity:0; animation: fade-in 1.8s ease-in 8.5s forwards;">
-        🐾 우리 아이들을 보러 갑니다 🐾
+        🐾 우리 아이를 보러 갑니다 🐾
       </div>
     </div>
     <style>
