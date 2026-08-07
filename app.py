@@ -11,6 +11,16 @@ from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
 
+st.markdown(
+    """
+    <head>
+        <meta name="mobile-web-app-capable" content="no">
+        <meta name="apple-mobile-web-app-capable" content="no">
+    </head>
+    """,
+    unsafe_allow_html=True,
+)
+
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
 JPEG_QUALITY = 85
