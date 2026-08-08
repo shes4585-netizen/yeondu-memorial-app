@@ -64,8 +64,11 @@ def save_gallery(pet_id, gallery):
     st.session_state.setdefault("_gallery_cache", {})[pet_id] = gallery
 
 
+KST = dt.timezone(dt.timedelta(hours=9))
+
+
 def now_str():
-    return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    return dt.datetime.now(KST).strftime("%Y-%m-%d %H:%M:%S")
 
 
 # ---------- 홈 탭 ----------
