@@ -8,6 +8,7 @@ from PIL import Image, ImageOps
 
 import github_storage as gh
 from intro_audio import INTRO_AUDIO_B64
+from door_image import DOOR_IMAGE_B64
 from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
@@ -364,7 +365,10 @@ def show_entrance_animation():
       <!-- 왼쪽 문 -->
       <div style="
           position:absolute; top:0; left:0; width:50%; height:100%;
-          background: linear-gradient(90deg, #d9c9a3 0%, #c2a877 100%);
+          background-image: linear-gradient(90deg, rgba(217,201,163,0.55), rgba(194,168,119,0.55)),
+                             url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+          background-size: 100% 100%, 200% 100%;
+          background-position: center, left center;
           border-right: 3px solid #8a6f43; box-shadow: 8px 0 18px rgba(0,0,0,0.35);
           animation: open-left 14s ease-in-out 1s forwards;">
       </div>
@@ -372,7 +376,10 @@ def show_entrance_animation():
       <!-- 오른쪽 문 -->
       <div style="
           position:absolute; top:0; right:0; width:50%; height:100%;
-          background: linear-gradient(270deg, #d9c9a3 0%, #c2a877 100%);
+          background-image: linear-gradient(270deg, rgba(217,201,163,0.55), rgba(194,168,119,0.55)),
+                             url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+          background-size: 100% 100%, 200% 100%;
+          background-position: center, right center;
           border-left: 3px solid #8a6f43; box-shadow: -8px 0 18px rgba(0,0,0,0.35);
           animation: open-right 14s ease-in-out 1s forwards;">
       </div>
