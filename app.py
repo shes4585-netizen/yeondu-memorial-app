@@ -18,7 +18,7 @@ JPEG_QUALITY = 85
 
 
 def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
-    """업로드된 이미지를 모바일 보기에 적당한 크기로 리사이즈하고 JPEG로 압축..
+    """업로드된 이미지를 모바일 보기에 적당한 크기로 리사이즈하고 JPEG로 압축.
     반환값: (압축된 bytes, 파일 확장자 'jpg')"""
     img = Image.open(io.BytesIO(raw_bytes))
     img = ImageOps.exif_transpose(img)  # 휴대폰 사진 회전 정보 보정
@@ -340,12 +340,13 @@ def show_entrance_animation():
         )
 
     html = f"""
-    <audio autoplay>
+    <audio id="introAudio" autoplay>
       <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
     </audio>
     <div style="
         position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
-        background: linear-gradient(180deg, #05081a 0%, #10204a 30%, #3a5a8c 55%, #a8c9e8 78%, #fdf3d9 100%);">
+        background: linear-gradient(180deg, #05081a 0%, #10204a 30%, #3a5a8c 55%, #a8c9e8 78%, #fdf3d9 100%);
+        animation: overlay-fade-out 2s ease-in 18s forwards;">
 
       {stars}
 
@@ -409,7 +410,30 @@ def show_entrance_animation():
         0%, 100% {{ opacity: .5; transform: scale(1); }}
         50%      {{ opacity: 1; transform: scale(1.3); }}
       }}
+      @keyframes overlay-fade-out {{
+        0%   {{ opacity: 1; }}
+        100% {{ opacity: 0; }}
+      }}
     </style>
+    <script>
+      (function() {{
+        var audioEl = document.getElementById('introAudio');
+        if (!audioEl) return;
+        setTimeout(function() {{
+          var vol = 1.0;
+          var fadeStep = setInterval(function() {{
+            vol -= 0.06;
+            if (vol <= 0) {{
+              vol = 0;
+              audioEl.volume = vol;
+              clearInterval(fadeStep);
+            }} else {{
+              audioEl.volume = vol;
+            }}
+          }}, 100);
+        }}, 18000);
+      }})();
+    </script>
     """
     placeholder = st.empty()
     with placeholder:
@@ -432,6 +456,7 @@ def check_password() -> bool:
         elif pw == correct:
             show_entrance_animation()
             st.session_state["authed"] = True
+            st.session_state["just_entered"] = True
             st.rerun()
         else:
             st.error("비밀번호가 틀렸어요.")
@@ -441,6 +466,22 @@ def check_password() -> bool:
 def main():
     if not check_password():
         return
+
+    if st.session_state.pop("just_entered", False):
+        st.markdown(
+            """
+            <style>
+            div[data-testid="stAppViewContainer"] {
+                animation: page-fade-in 0.9s ease-out;
+            }
+            @keyframes page-fade-in {
+                0%   { opacity: 0; }
+                100% { opacity: 1; }
+            }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
 
     with st.sidebar:
         if st.button("로그아웃"):
