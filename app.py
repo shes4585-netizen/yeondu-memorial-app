@@ -363,30 +363,21 @@ def show_entrance_animation():
       </div>
 
       <!-- 왼쪽 문 -->
-      <div style="
+      <div id="door-left" style="
           position:absolute; top:0; left:0; width:50%; height:100%;
-          background-image:
-            linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
-            url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-          background-size: 100% 100%, 200% 100%;
-          background-position: center, left center;
           border-right: 3px solid #8a6f43;
           box-shadow: 8px 0 18px rgba(0,0,0,0.35);
-          animation: open-left 14s ease-in-out 1s forwards;">
+          animation: open-left 14s ease-in-out 2s forwards;">
       </div>
 
       <!-- 오른쪽 문 -->
-      <div style="
+      <div id="door-right" style="
           position:absolute; top:0; right:0; width:50%; height:100%;
-          background-image:
-            linear-gradient(rgba(0,0,0,0.10), rgba(0,0,0,0.10)),
-            url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-          background-size: 100% 100%, 200% 100%;
-          background-position: center, right center;
           border-left: 3px solid #8a6f43;
           box-shadow: -8px 0 18px rgba(0,0,0,0.35);
-          animation: open-right 14s ease-in-out 1s forwards;">
+          animation: open-right 14s ease-in-out 2s forwards;">
       </div>
+
 
 
       <!-- 문구: 나타났다가 하늘로 날아가며 작아짐 -->
@@ -398,6 +389,17 @@ def show_entrance_animation():
       </div>
     </div>
     <style>
+      #door-left, #door-right {{
+        background-size: 200% 100%;
+      }}
+      #door-left {{
+        background-image: url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+        background-position: left center;
+      }}
+      #door-right {{
+        background-image: url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+        background-position: right center;
+      }}
       @keyframes open-left {{
         0%   {{ transform: translateX(0); }}
         100% {{ transform: translateX(-100%); }}
