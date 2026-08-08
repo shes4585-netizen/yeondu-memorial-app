@@ -365,22 +365,32 @@ def show_entrance_animation():
       <!-- 왼쪽 문 -->
       <div style="
           position:absolute; top:0; left:0; width:50%; height:100%;
-          background-image: linear-gradient(90deg, rgba(217,201,163,0.55), rgba(194,168,119,0.55)),
-                             url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-          background-size: 100% 100%, 200% 100%;
-          background-position: center, left center;
-          border-right: 3px solid #8a6f43; box-shadow: 8px 0 18px rgba(0,0,0,0.35);
+          background-image:
+            linear-gradient(90deg, rgba(224,178,64,0.72), rgba(196,138,32,0.72)),
+            repeating-linear-gradient(180deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 2px, transparent 2px, transparent 11px),
+            url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+          background-size: 100% 100%, 100% 100%, 200% 100%;
+          background-position: center, center, left center;
+          border-right: 3px solid #8a6f43;
+          box-shadow: 8px 0 18px rgba(0,0,0,0.35),
+                      inset 0 0 0 10px rgba(0,0,0,0.18),
+                      inset 0 0 0 14px rgba(255,235,180,0.35);
           animation: open-left 14s ease-in-out 1s forwards;">
       </div>
 
       <!-- 오른쪽 문 -->
       <div style="
           position:absolute; top:0; right:0; width:50%; height:100%;
-          background-image: linear-gradient(270deg, rgba(217,201,163,0.55), rgba(194,168,119,0.55)),
-                             url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-          background-size: 100% 100%, 200% 100%;
-          background-position: center, right center;
-          border-left: 3px solid #8a6f43; box-shadow: -8px 0 18px rgba(0,0,0,0.35);
+          background-image:
+            linear-gradient(270deg, rgba(224,178,64,0.72), rgba(196,138,32,0.72)),
+            repeating-linear-gradient(180deg, rgba(0,0,0,0.10) 0px, rgba(0,0,0,0.10) 2px, transparent 2px, transparent 11px),
+            url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
+          background-size: 100% 100%, 100% 100%, 200% 100%;
+          background-position: center, center, right center;
+          border-left: 3px solid #8a6f43;
+          box-shadow: -8px 0 18px rgba(0,0,0,0.35),
+                      inset 0 0 0 10px rgba(0,0,0,0.18),
+                      inset 0 0 0 14px rgba(255,235,180,0.35);
           animation: open-right 14s ease-in-out 1s forwards;">
       </div>
 
