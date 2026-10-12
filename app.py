@@ -17,6 +17,7 @@ st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
 JPEG_QUALITY = 85
+MAX_GIF_BYTES = 5 * 1024 * 1024  # GIF 업로드 상한 5MB (원본 그대로 저장)
 
 
 def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
@@ -162,11 +163,18 @@ def render_pet_tab(pet, pets):
             st.rerun()
 
     st.markdown("#### 📸 사진 올리기")
-    uploaded = st.file_uploader("사진 선택", type=["jpg", "jpeg", "png", "webp"], key=f"upl_{pet_id}")
+    uploaded = st.file_uploader("사진 선택", type=["jpg", "jpeg", "png", "webp", "gif"], key=f"upl_{pet_id}")
     if uploaded is not None:
-        if st.button("업로드", key=f"upl_btn_{pet_id}"):
-            with st.spinner("사진 크기 조정 중..."):
-                resized_bytes, ext = resize_image(uploaded.getvalue())
+        is_gif = uploaded.name.lower().endswith(".gif")
+        too_big = is_gif and uploaded.size > MAX_GIF_BYTES
+        if too_big:
+            st.error(f"GIF는 5MB까지 올릴 수 있어요. (현재 {uploaded.size / 1024 / 1024:.1f}MB)")
+        if st.button("업로드", key=f"upl_btn_{pet_id}", disabled=too_big):
+            if is_gif:
+                resized_bytes, ext = uploaded.getvalue(), "gif"  # 움직임 유지를 위해 변환하지 않음
+            else:
+                with st.spinner("사진 크기 조정 중..."):
+                    resized_bytes, ext = resize_image(uploaded.getvalue())
             filename = f"{uuid.uuid4().hex[:8]}.{ext}"
             gh.put_file(f"data/{pet_id}/photos/{filename}", resized_bytes,
                         message=f"add photo for {pet_id}")
