@@ -8,8 +8,8 @@ from PIL import Image, ImageOps
 
 import github_storage as gh
 from intro_audio import INTRO_AUDIO_B64
-from door_image import DOOR_IMAGE_B64
 from sky_image import SKY_IMAGE_B64
+from sfx_audio import SFX_AUDIO_B64
 from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
@@ -378,68 +378,147 @@ def show_entrance_animation():
     <audio id="introAudio" autoplay>
       <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
     </audio>
-    <div style="
-        position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
-        background: #06122a;
-        animation: overlay-fade-out 2s ease-in 18s forwards;">
+    <audio id="sfxAudio" autoplay>
+      <source src="data:audio/mp4;base64,{SFX_AUDIO_B64}" type="audio/mp4">
+    </audio>
+    <div id="room">
+      <!-- 실내 안테나 (토끼 귀) -->
+      <div id="ant-base"></div>
+      <div class="rod" id="rod-l"><i></i></div>
+      <div class="rod" id="rod-r"><i></i></div>
 
-      <div id="sky-bg" style="position:absolute; inset:0;"></div>
-      {stars}
-
-      <!-- 문 너머로 보이는 빛 -->
-      <div style="
-          position:absolute; left:50%; top:50%; width:280px; height:280px;
-          transform: translate(-50%,-50%); border-radius:50%;
-          background: radial-gradient(circle, rgba(255,244,214,0.45) 0%, rgba(255,244,214,0.15) 45%, rgba(255,244,214,0) 75%);
-          opacity:0; animation: glow-in 20s ease-in forwards;">
+      <!-- 자바라 TV 본체 -->
+      <div id="cabinet">
+        <div id="screen">
+          <div id="sky-bg"></div>
+          {stars}
+          <div id="glow"></div>
+          <div id="crt"></div>
+          <div id="msg">🐾 우리 아이를 보러 갑니다 🐾</div>
+        </div>
+        <div id="side">
+          <div class="plate">꼬리별</div>
+          <div class="knob"></div>
+          <div class="knob"></div>
+          <div class="grille"></div>
+        </div>
+        <div id="shutter">
+          <div id="door-left"><b class="handle" style="right:5px"></b></div>
+          <div id="door-right"><b class="handle" style="left:5px"></b></div>
+        </div>
+        <div id="power">
+          <span class="plabel">POWER</span>
+          <div id="led"></div>
+          <div id="sw"><div id="lever"></div></div>
+        </div>
       </div>
-
-      <!-- 왼쪽 문 -->
-      <div id="door-left" style="
-          position:absolute; top:0; left:0; width:50%; height:100%;
-          border-right: 3px solid #8a6f43;
-          box-shadow: 8px 0 18px rgba(0,0,0,0.35);
-          animation: open-left 14s ease-in-out 2s forwards;">
-      </div>
-
-      <!-- 오른쪽 문 -->
-      <div id="door-right" style="
-          position:absolute; top:0; right:0; width:50%; height:100%;
-          border-left: 3px solid #8a6f43;
-          box-shadow: -8px 0 18px rgba(0,0,0,0.35);
-          animation: open-right 14s ease-in-out 2s forwards;">
-      </div>
-
-
-
-      <!-- 문구: 나타났다가 하늘로 날아가며 작아짐 -->
-      <div style="
-          position:absolute; left:0; right:0; bottom:22px; text-align:center;
-          color:#fff8e6; font-size:20px; font-weight:700; text-shadow: 0 1px 6px rgba(0,0,0,0.85);
-          opacity:0; animation: text-life 9s ease-in 11s forwards;">
-        🐾 우리 아이를 보러 갑니다 🐾
-      </div>
+      <div class="leg" id="leg-l"></div>
+      <div class="leg" id="leg-r"></div>
+      <div id="floor"></div>
     </div>
     <style>
       #sky-bg {{ background-image: url('data:image/jpeg;base64,{SKY_IMAGE_B64}'); background-size: cover; background-position: center; }}
+      body {{ margin:0; }}
+      #room {{
+        position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
+        background: radial-gradient(ellipse at 50% 40%, #3a2a1c 0%, #20160e 70%, #120c07 100%);
+        animation: overlay-fade-out 2s ease-in 18s forwards;
+      }}
+      #cabinet {{
+        position:absolute; left:50%; top:58px; transform:translateX(-50%);
+        width:90%; max-width:470px; height:244px; box-sizing:border-box;
+        display:flex; gap:8px; padding:12px 12px 32px; border-radius:10px;
+        border:3px solid #3d2410;
+        background:
+          repeating-linear-gradient(92deg, rgba(0,0,0,0) 0 7px, rgba(0,0,0,.07) 7px 8px, rgba(255,255,255,.03) 8px 12px),
+          linear-gradient(180deg, #9a6532 0%, #7a4c22 55%, #6a401c 100%);
+        box-shadow: 0 10px 22px rgba(0,0,0,.55), inset 0 2px 3px rgba(255,220,160,.35);
+        z-index:2;
+      }}
+      #screen {{
+        position:relative; flex:1; overflow:hidden; border-radius:26px / 22px;
+        border:6px solid #17100a; background:#06122a;
+        box-shadow: inset 0 0 22px rgba(0,0,0,.9), 0 0 0 2px #5a3a1a;
+      }}
+      #sky-bg {{ position:absolute; inset:0; background-image: url('data:image/jpeg;base64,{SKY_IMAGE_B64}'); background-size: cover; background-position: center; }}
+      #glow {{
+        position:absolute; left:50%; top:50%; width:200px; height:200px; transform:translate(-50%,-50%);
+        border-radius:50%; opacity:0; animation: glow-in 20s ease-in forwards;
+        background: radial-gradient(circle, rgba(255,244,214,.45) 0%, rgba(255,244,214,.15) 45%, rgba(255,244,214,0) 75%);
+      }}
+      #crt {{
+        position:absolute; inset:0; pointer-events:none;
+        background:
+          repeating-linear-gradient(0deg, rgba(0,0,0,.06) 0 1px, rgba(0,0,0,0) 1px 3px),
+          radial-gradient(ellipse at center, rgba(0,0,0,0) 55%, rgba(0,0,0,.55) 100%);
+      }}
       #door-left, #door-right {{
-        background-size: 200% 100%;
+        position:absolute; top:0; width:50%; height:100%; will-change:transform;
+        background:
+          repeating-linear-gradient(90deg, #c08a4c 0, #d3a266 5px, #9a6630 9px, #6b4220 12px, #8a5a2b 14px, #b98448 18px);
+        box-shadow: inset 0 0 14px rgba(0,0,0,.45);
       }}
-      #door-left {{
-        background-image: url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-        background-position: left center;
+      #door-left  {{ left:0;  transform-origin:left center;  border-right:2px solid #4a2c12; animation: open-left 14s ease-in-out 2.4s forwards; }}
+      #door-right {{ right:0; transform-origin:right center; border-left:2px solid #4a2c12;  animation: open-right 14s ease-in-out 2.4s forwards; }}
+      .handle {{ position:absolute; top:50%; width:7px; height:28px; margin-top:-14px; border-radius:4px;
+        background: linear-gradient(90deg,#f3dc9a,#b08a32); box-shadow:0 1px 3px rgba(0,0,0,.6); }}
+      #msg {{
+        position:absolute; left:0; right:0; bottom:16px; text-align:center; padding:0 6px;
+        color:#fff8e6; font-size:15px; font-weight:700; text-shadow:0 1px 6px rgba(0,0,0,.9);
+        opacity:0; animation: text-life 9s ease-in 11s forwards;
       }}
-      #door-right {{
-        background-image: url('data:image/jpeg;base64,{DOOR_IMAGE_B64}');
-        background-position: right center;
+      #side {{
+        flex:0 0 58px; border-radius:8px; padding:8px 0; box-sizing:border-box;
+        display:flex; flex-direction:column; align-items:center; gap:10px;
+        background: linear-gradient(180deg,#5a3719,#46280f); box-shadow: inset 0 0 8px rgba(0,0,0,.6);
       }}
+      .plate {{ font-size:9px; font-weight:700; color:#3a2a08; padding:2px 5px; border-radius:2px;
+        background:linear-gradient(180deg,#f0d98e,#b8913a); }}
+      .knob {{ width:30px; height:30px; border-radius:50%; position:relative;
+        background: radial-gradient(circle at 35% 30%, #f6ead0, #b9a47a 60%, #6e5c3a);
+        box-shadow: 0 2px 4px rgba(0,0,0,.7); }}
+      .knob::after {{ content:""; position:absolute; left:50%; top:3px; width:2px; height:9px; margin-left:-1px; background:#3a2a10; transform-origin:1px 12px; transform:rotate(35deg); }}
+      .grille {{ flex:1; width:36px; border-radius:4px;
+        background: repeating-linear-gradient(0deg,#1a0f06 0 2px,#5a3a1a 2px 5px); box-shadow: inset 0 0 4px #000; }}
+      .leg {{ position:absolute; top:298px; width:15px; height:40px; z-index:1;
+        background: linear-gradient(90deg,#7a4c22,#5a3517); border-radius:2px 2px 5px 5px; }}
+      #leg-l {{ left:calc(50% - min(45%,235px) + 14px); transform:rotate(7deg); }}
+      #leg-r {{ left:calc(50% + min(45%,235px) - 29px); transform:rotate(-7deg); }}
+      #floor {{ position:absolute; left:10%; right:10%; bottom:2px; height:12px; border-radius:50%;
+        background: radial-gradient(ellipse, rgba(0,0,0,.55), rgba(0,0,0,0) 70%); }}
+      #ant-base {{ position:absolute; left:50%; top:50px; width:44px; height:12px; margin-left:-22px; z-index:3;
+        border-radius:22px 22px 4px 4px; background:linear-gradient(180deg,#2c2c2c,#101010); box-shadow:0 2px 3px rgba(0,0,0,.6); }}
+      .rod {{ position:absolute; left:50%; top:52px; width:3px; height:58px; margin-left:-1px; z-index:2;
+        background:linear-gradient(90deg,#e6e6e6,#8c8c8c); transform-origin:50% 100%; margin-top:-48px; border-radius:2px; }}
+      .rod i {{ position:absolute; top:-5px; left:-3px; width:9px; height:9px; border-radius:50%;
+        background:radial-gradient(circle at 35% 30%,#fff,#9a9a9a); }}
+      #rod-l {{ transform:rotate(-30deg); }}
+      #rod-r {{ transform:rotate(30deg); }}
+      #shutter {{ position:absolute; left:12px; right:12px; top:12px; bottom:32px; z-index:5; border-radius:8px; overflow:hidden; pointer-events:none; }}
+      #power {{ position:absolute; right:16px; bottom:7px; height:18px; display:flex; align-items:center; gap:7px; z-index:6; }}
+      .plabel {{ font-size:8px; font-weight:700; letter-spacing:1px; color:#e8cf94; text-shadow:0 1px 1px #2a1606; }}
+      #led {{ position:relative; width:9px; height:9px; border-radius:50%; background:radial-gradient(circle at 35% 30%,#5a1a14,#2a0806);
+        box-shadow: 0 0 0 2px #3a2410, inset 0 1px 2px rgba(0,0,0,.7); animation: led-pulse 2.4s ease-in-out 1.8s infinite; }}
+      #led::before {{ content:""; position:absolute; inset:0; border-radius:50%; opacity:0;
+        background:radial-gradient(circle at 35% 30%,#ffb0a0,#ff2a1a 55%,#c00);
+        box-shadow: 0 0 6px 2px rgba(255,40,20,.9), 0 0 14px 5px rgba(255,40,20,.45);
+        animation: led-on .3s ease-out 1.5s forwards; }}
+      #sw {{ position:relative; width:30px; height:16px; border-radius:8px; background:#1d1208; box-shadow: inset 0 1px 3px #000, 0 0 0 2px #3a2410;
+        animation: sw-bg .2s linear 1.1s forwards; }}
+      #lever {{ position:absolute; left:2px; top:2px; width:12px; height:12px; border-radius:50%;
+        background: radial-gradient(circle at 35% 30%,#f6ead0,#a8956a); box-shadow:0 1px 2px rgba(0,0,0,.8);
+        animation: sw-on .25s ease-out 1.1s forwards; }}
+      @keyframes sw-on {{ 0% {{ transform:translateX(0) scale(1); }} 40% {{ transform:translateX(5px) scale(.88); }} 100% {{ transform:translateX(14px) scale(1); }} }}
+      @keyframes sw-bg {{ to {{ background:#3b1d12; }} }}
+      @keyframes led-on {{ 0% {{ opacity:0; }} 35% {{ opacity:1; }} 55% {{ opacity:.55; }} 100% {{ opacity:1; }} }}
+      @keyframes led-pulse {{ 0%,100% {{ filter:brightness(1); }} 50% {{ filter:brightness(1.35); }} }}
       @keyframes open-left {{
-        0%   {{ transform: translateX(0); }}
-        100% {{ transform: translateX(-100%); }}
+        0%   {{ transform: scaleX(1); }}
+        100% {{ transform: scaleX(0.07); }}
       }}
       @keyframes open-right {{
-        0%   {{ transform: translateX(0); }}
-        100% {{ transform: translateX(100%); }}
+        0%   {{ transform: scaleX(1); }}
+        100% {{ transform: scaleX(0.07); }}
       }}
       @keyframes glow-in {{
         0%   {{ opacity: 0; }}
@@ -450,7 +529,7 @@ def show_entrance_animation():
         0%   {{ opacity: 0; transform: translateY(10px) scale(1); }}
         15%  {{ opacity: 1; transform: translateY(0) scale(1); }}
         55%  {{ opacity: 1; transform: translateY(0) scale(1); }}
-        100% {{ opacity: 0; transform: translateY(-130px) scale(0.4); }}
+        100% {{ opacity: 0; transform: translateY(-110px) scale(0.4); }}
       }}
       .spk {{
         position:absolute; opacity:0; transform:translate(-50%,-50%) scale(.3);
@@ -480,6 +559,8 @@ def show_entrance_animation():
     </style>
     <script>
       (function() {{
+        var sfx = document.getElementById('sfxAudio');
+        if (sfx) {{ try {{ var pr = sfx.play(); if (pr && pr.catch) pr.catch(function(){{}}); }} catch (e) {{}} }}
         var audioEl = document.getElementById('introAudio');
         if (!audioEl) return;
         setTimeout(function() {{
