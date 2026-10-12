@@ -352,6 +352,28 @@ def show_entrance_animation():
             f'opacity:.5; animation: big-twinkle 3.2s ease-in-out {delay}s infinite;"></div>'
         )
 
+    # 반짝임 추가: 잔별 + 십자 반짝이(스파클)
+    import random
+    rnd = random.Random(7)
+    for _ in range(36):
+        left, top = rnd.uniform(2, 98), rnd.uniform(3, 52)
+        size = rnd.choice([1.5, 2, 2.5, 3])
+        dur, delay = rnd.uniform(1.6, 3.6), rnd.uniform(0, 4)
+        stars += (
+            f'<div style="position:absolute; left:{left:.1f}%; top:{top:.1f}%; '
+            f'width:{size}px; height:{size}px; background:#fff; border-radius:50%; '
+            f'box-shadow:0 0 5px 1px rgba(200,225,255,0.9); '
+            f'opacity:.2; animation: twinkle {dur:.1f}s ease-in-out {delay:.1f}s infinite;"></div>'
+        )
+    for _ in range(12):
+        left, top = rnd.uniform(5, 95), rnd.uniform(5, 50)
+        size = rnd.choice([16, 20, 26, 32])
+        dur, delay = rnd.uniform(2.4, 4.2), rnd.uniform(0, 5)
+        stars += (
+            f'<div class="spk" style="left:{left:.1f}%; top:{top:.1f}%; '
+            f'width:{size}px; height:{size}px; animation-duration:{dur:.1f}s; animation-delay:{delay:.1f}s;"></div>'
+        )
+
     html = f"""
     <audio id="introAudio" autoplay>
       <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
@@ -429,6 +451,19 @@ def show_entrance_animation():
         15%  {{ opacity: 1; transform: translateY(0) scale(1); }}
         55%  {{ opacity: 1; transform: translateY(0) scale(1); }}
         100% {{ opacity: 0; transform: translateY(-130px) scale(0.4); }}
+      }}
+      .spk {{
+        position:absolute; opacity:0; transform:translate(-50%,-50%) scale(.3);
+        background:
+          radial-gradient(circle, #fff 0 10%, rgba(255,255,255,0) 45%),
+          linear-gradient(90deg, rgba(255,255,255,0) 0%, #fff 50%, rgba(255,255,255,0) 100%) center/100% 2px no-repeat,
+          linear-gradient(0deg, rgba(255,255,255,0) 0%, #fff 50%, rgba(255,255,255,0) 100%) center/2px 100% no-repeat;
+        filter: drop-shadow(0 0 4px rgba(190,220,255,0.95));
+        animation: spk-pulse 3s ease-in-out infinite;
+      }}
+      @keyframes spk-pulse {{
+        0%, 100% {{ opacity:0; transform:translate(-50%,-50%) scale(.3) rotate(0deg); }}
+        50%      {{ opacity:1; transform:translate(-50%,-50%) scale(1.15) rotate(45deg); }}
       }}
       @keyframes twinkle {{
         0%, 100% {{ opacity: .3; }}
