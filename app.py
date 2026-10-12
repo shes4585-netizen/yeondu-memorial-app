@@ -17,7 +17,8 @@ st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
 PETS_PATH = "data/pets.json"
 MAX_DIMENSION = 1600  # 긴 변 기준 최대 픽셀 (모바일 화면에 충분한 크기)
 JPEG_QUALITY = 85
-MAX_GIF_BYTES = 10 * 1024 * 1024  # GIF 업로드 상한 10MB (원본 그대로 저장)
+MAX_RAW_BYTES = 10 * 1024 * 1024  # GIF/MP4 업로드 상한 10MB (원본 그대로 저장)
+RAW_EXTS = ("gif", "mp4")
 
 
 def resize_image(raw_bytes: bytes) -> tuple[bytes, str]:
@@ -53,6 +54,25 @@ def load_pets():
 def save_pets(pets):
     gh.put_json(PETS_PATH, pets, message="update pets.json")
     st.session_state["_pets_cache"] = pets
+
+
+def fetch_media(pet_id, filename):
+    """사진/영상 파일을 (bytes, sha)로 가져온다. 큰 파일(gif/mp4)은 세션에 기억해 재다운로드를 줄인다."""
+    path = f"data/{pet_id}/photos/{filename}"
+    cache = st.session_state.setdefault("_media_cache", {})
+    if path in cache:
+        return cache[path]
+    got = gh.get_file(path)
+    if got and filename.lower().endswith(RAW_EXTS):
+        cache[path] = got
+    return got
+
+
+def show_media(filename, data):
+    if filename.lower().endswith(".mp4"):
+        st.video(data)
+    else:
+        st.image(data, use_container_width=True)
 
 
 def load_gallery(pet_id):
@@ -113,11 +133,11 @@ def render_home(pets):
         return
 
     for e in events[:10]:
-        got = gh.get_file(f"data/{e['pet_id']}/photos/{e['filename']}")
+        got = fetch_media(e["pet_id"], e["filename"])
         cols = st.columns([1, 2])
         with cols[0]:
             if got:
-                st.image(got[0], use_container_width=True)
+                show_media(e["filename"], got[0])
         with cols[1]:
             st.caption(f"{e['time']} · {e['pet_name']}")
             if e["type"] == "comment":
@@ -162,16 +182,18 @@ def render_pet_tab(pet, pets):
             st.success("삭제했어요.")
             st.rerun()
 
-    st.markdown("#### 📸 사진 올리기")
-    uploaded = st.file_uploader("사진 선택", type=["jpg", "jpeg", "png", "webp", "gif"], key=f"upl_{pet_id}")
+    st.markdown("#### 📸 사진/영상 올리기")
+    uploaded = st.file_uploader("사진·GIF·MP4 선택 (GIF/MP4는 10MB까지)",
+                                type=["jpg", "jpeg", "png", "webp", "gif", "mp4"], key=f"upl_{pet_id}")
     if uploaded is not None:
-        is_gif = uploaded.name.lower().endswith(".gif")
-        too_big = is_gif and uploaded.size > MAX_GIF_BYTES
+        raw_ext = uploaded.name.lower().rsplit(".", 1)[-1]
+        is_raw = raw_ext in RAW_EXTS
+        too_big = is_raw and uploaded.size > MAX_RAW_BYTES
         if too_big:
-            st.error(f"GIF는 10MB까지 올릴 수 있어요. (현재 {uploaded.size / 1024 / 1024:.1f}MB)")
+            st.error(f"{raw_ext.upper()}는 10MB까지 올릴 수 있어요. (현재 {uploaded.size / 1024 / 1024:.1f}MB)")
         if st.button("업로드", key=f"upl_btn_{pet_id}", disabled=too_big):
-            if is_gif:
-                resized_bytes, ext = uploaded.getvalue(), "gif"  # 움직임 유지를 위해 변환하지 않음
+            if is_raw:
+                resized_bytes, ext = uploaded.getvalue(), raw_ext  # 움직임/영상 유지를 위해 변환하지 않음
             else:
                 with st.spinner("사진 크기 조정 중..."):
                     resized_bytes, ext = resize_image(uploaded.getvalue())
@@ -196,9 +218,9 @@ def render_pet_tab(pet, pets):
         st.caption("아직 사진이 없어요.")
 
     for item in gallery_sorted:
-        got = gh.get_file(f"data/{pet_id}/photos/{item['filename']}")
+        got = fetch_media(pet_id, item["filename"])
         if got:
-            st.image(got[0], use_container_width=True)
+            show_media(item["filename"], got[0])
         st.caption(item["uploaded_at"])
 
         for idx, c in enumerate(item.get("comments", [])):
@@ -259,6 +281,7 @@ def render_pet_tab(pet, pets):
                 if got:
                     gh.delete_file(f"data/{pet_id}/photos/{item['filename']}", got[1],
                                     message=f"delete photo {item['filename']}")
+                st.session_state.get("_media_cache", {}).pop(f"data/{pet_id}/photos/{item['filename']}", None)
                 gallery[:] = [g for g in gallery if g["filename"] != item["filename"]]
                 save_gallery(pet_id, gallery)
                 st.success("사진을 삭제했어요.")
@@ -272,7 +295,7 @@ def render_pet_tab(pet, pets):
         with st.spinner("압축하는 중..."):
             photos = {}
             for item in gallery:
-                got = gh.get_file(f"data/{pet_id}/photos/{item['filename']}")
+                got = fetch_media(pet_id, item["filename"])
                 if got:
                     photos[item["filename"]] = got[0]
             zip_bytes = build_pet_zip(pet, gallery, photos)

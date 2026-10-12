@@ -39,7 +39,15 @@ def get_file(path: str):
         return None
     r.raise_for_status()
     data = r.json()
-    content = base64.b64decode(data["content"])
+    if data.get("content") and data.get("encoding") == "base64":
+        content = base64.b64decode(data["content"])
+    else:
+        # 1MB 이상 파일(GIF/동영상 등)은 content가 비어 오므로 raw로 다시 받는다
+        h = dict(_headers())
+        h["Accept"] = "application/vnd.github.raw+json"
+        r2 = requests.get(_url(path), headers=h, params={"ref": _cfg()["branch"]})
+        r2.raise_for_status()
+        content = r2.content
     return content, data["sha"]
 
 
