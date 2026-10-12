@@ -398,7 +398,7 @@ def show_entrance_animation():
         )
 
     html = f"""
-    <audio id="introAudio" autoplay>
+    <audio id="introAudio" preload="auto">
       <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
     </audio>
     <audio id="sfxAudio" autoplay>
@@ -583,13 +583,28 @@ def show_entrance_animation():
     <script>
       (function() {{
         var sfx = document.getElementById('sfxAudio');
-        if (sfx) {{ try {{ var pr = sfx.play(); if (pr && pr.catch) pr.catch(function(){{}}); }} catch (e) {{}} }}
+        if (sfx) {{ try {{ var p0 = sfx.play(); if (p0 && p0.catch) p0.catch(function(){{}}); }} catch (e) {{}} }}
         var audioEl = document.getElementById('introAudio');
         if (!audioEl) return;
+        var BGM_VOL = 0.45;          // 배경음 볼륨 (0~1)
+        audioEl.volume = BGM_VOL;
+        var started = false;
+        function startBgm() {{
+          if (started) return;
+          try {{
+            var pr = audioEl.play();
+            if (pr && pr.then) {{ pr.then(function() {{ started = true; }}).catch(function() {{}}); }}
+            else {{ started = true; }}
+          }} catch (e) {{}}
+        }}
+        // 효과음(딸깍·치직·우웅)이 끝나고 약 1.5초 쉰 뒤(4.5초) 배경음 시작
+        setTimeout(startBgm, 4500);
+        document.addEventListener('click', startBgm);
+        document.addEventListener('touchstart', startBgm);
         setTimeout(function() {{
-          var vol = 1.0;
+          var vol = BGM_VOL;
           var fadeStep = setInterval(function() {{
-            vol -= 0.06;
+            vol -= 0.03;
             if (vol <= 0) {{
               vol = 0;
               audioEl.volume = vol;
