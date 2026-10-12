@@ -9,6 +9,7 @@ from PIL import Image, ImageOps
 import github_storage as gh
 from intro_audio import INTRO_AUDIO_B64
 from door_image import DOOR_IMAGE_B64
+from sky_image import SKY_IMAGE_B64
 from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
@@ -349,16 +350,17 @@ def show_entrance_animation():
     </audio>
     <div style="
         position:relative; width:100%; height:340px; overflow:hidden; border-radius:12px;
-        background: linear-gradient(180deg, #05081a 0%, #10204a 30%, #3a5a8c 55%, #a8c9e8 78%, #fdf3d9 100%);
+        background: #06122a;
         animation: overlay-fade-out 2s ease-in 18s forwards;">
 
+      <div id="sky-bg" style="position:absolute; inset:0;"></div>
       {stars}
 
       <!-- 문 너머로 보이는 빛 -->
       <div style="
           position:absolute; left:50%; top:50%; width:280px; height:280px;
           transform: translate(-50%,-50%); border-radius:50%;
-          background: radial-gradient(circle, rgba(255,244,214,0.95) 0%, rgba(255,244,214,0.35) 45%, rgba(255,244,214,0) 75%);
+          background: radial-gradient(circle, rgba(255,244,214,0.45) 0%, rgba(255,244,214,0.15) 45%, rgba(255,244,214,0) 75%);
           opacity:0; animation: glow-in 20s ease-in forwards;">
       </div>
 
@@ -383,12 +385,13 @@ def show_entrance_animation():
       <!-- 문구: 나타났다가 하늘로 날아가며 작아짐 -->
       <div style="
           position:absolute; left:0; right:0; bottom:22px; text-align:center;
-          color:#3a2e1a; font-size:20px; font-weight:700; text-shadow: 0 1px 4px rgba(255,255,255,0.6);
+          color:#fff8e6; font-size:20px; font-weight:700; text-shadow: 0 1px 6px rgba(0,0,0,0.85);
           opacity:0; animation: text-life 9s ease-in 11s forwards;">
         🐾 우리 아이를 보러 갑니다 🐾
       </div>
     </div>
     <style>
+      #sky-bg {{ background-image: url('data:image/jpeg;base64,{SKY_IMAGE_B64}'); background-size: cover; background-position: center; }}
       #door-left, #door-right {{
         background-size: 200% 100%;
       }}
