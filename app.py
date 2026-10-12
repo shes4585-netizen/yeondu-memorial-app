@@ -10,6 +10,7 @@ import github_storage as gh
 from intro_audio import INTRO_AUDIO_B64
 from sky_image import SKY_IMAGE_B64
 from sfx_audio import SFX_AUDIO_B64
+from tv_audio import TV_AUDIO_B64
 from backup_utils import build_pet_zip, make_downloadable_backup
 
 st.set_page_config(page_title="꼬리별", page_icon="🐾", layout="centered")
@@ -401,6 +402,9 @@ def show_entrance_animation():
     <audio id="introAudio" preload="auto">
       <source src="data:audio/mp4;base64,{INTRO_AUDIO_B64}" type="audio/mp4">
     </audio>
+    <audio id="tvAudio" autoplay>
+      <source src="data:audio/mp4;base64,{TV_AUDIO_B64}" type="audio/mp4">
+    </audio>
     <audio id="sfxAudio" autoplay>
       <source src="data:audio/mp4;base64,{SFX_AUDIO_B64}" type="audio/mp4">
     </audio>
@@ -584,6 +588,8 @@ def show_entrance_animation():
       (function() {{
         var sfx = document.getElementById('sfxAudio');
         if (sfx) {{ try {{ var p0 = sfx.play(); if (p0 && p0.catch) p0.catch(function(){{}}); }} catch (e) {{}} }}
+        var tv = document.getElementById('tvAudio');
+        if (tv) {{ try {{ var p1 = tv.play(); if (p1 && p1.catch) p1.catch(function(){{}}); }} catch (e) {{}} }}
         var audioEl = document.getElementById('introAudio');
         if (!audioEl) return;
         var BGM_VOL = 0.45;          // 배경음 볼륨 (0~1)
@@ -597,8 +603,8 @@ def show_entrance_animation():
             else {{ started = true; }}
           }} catch (e) {{}}
         }}
-        // 효과음(딸깍·치직·우웅)이 끝나고 약 1.5초 쉰 뒤(4.5초) 배경음 시작
-        setTimeout(startBgm, 4500);
+        // 옛날 TV 소리(약 11.6초)가 끝나고 약 1.5초 쉰 뒤(13초) 배경음 시작
+        setTimeout(startBgm, 13000);
         document.addEventListener('click', startBgm);
         document.addEventListener('touchstart', startBgm);
         setTimeout(function() {{
